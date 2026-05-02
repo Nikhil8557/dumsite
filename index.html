@@ -1,16 +1,378 @@
-<html>
-  <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cute Interactive Cat</title>
+    <!-- Using Tailwind CSS for modern, responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>My Portfolio</title>
-  </head>
-  <body class="bg-blue-100">
-    <h1 class="text-2xl text-blue-500">My Portfolio</h1>
-    <h1 class= "" >My Portfolio</h1>
-    <img src="https://placecats.com/300/200" alt="A cute cat" width="300">
-    <p>This is a website I can show off to friends and family. It has info about me, my projects, and how to get in touch.</p>
-    <div class="bg-white dark:bg-gray-800 rounded-lg px-6 py-8 ring shadow-xl ring-gray-900/5">
-  </div>
-    <span clas-lg">
-    </span>
-  </body>
+    <style>
+        /* Custom Animations */
+        @keyframes float-up {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02) translateY(-2px); }
+        }
+
+        @keyframes purr {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
+        .breathe-anim {
+            animation: breathe 3s ease-in-out infinite;
+        }
+
+        .purr-anim {
+            animation: purr 0.2s ease-in-out infinite;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 50;
+            font-size: 1.5rem;
+            animation: float-up 1s ease-out forwards;
+        }
+
+        /* Smooth transitions for the SVG elements */
+        #pupil-left, #pupil-right {
+            transition: transform 0.1s ease-out;
+        }
+
+        .bar-transition {
+            transition: width 0.3s ease-in-out, background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-pink-50 min-h-screen flex items-center justify-center p-4 font-sans text-slate-700 overflow-hidden relative">
+
+    <div class="max-w-md w-full flex flex-col items-center">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-pink-400 tracking-tight mb-2">Mochi the Cat</h1>
+            <p class="text-slate-500 font-medium">Take care of your new virtual friend!</p>
+        </div>
+
+        <!-- The Cat Container -->
+        <div id="cat-container" class="relative w-64 h-64 sm:w-72 sm:h-72 cursor-pointer breathe-anim drop-shadow-2xl mb-8" onclick="petCat()">
+            <!-- SVG Cat Graphic -->
+            <svg viewBox="0 0 200 200" class="w-full h-full" id="cat-svg">
+                <defs>
+                    <linearGradient id="body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="100%" stop-color="#f8fafc"/>
+                    </linearGradient>
+                    <radialGradient id="blush-grad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#f472b6" stop-opacity="0.6"/>
+                        <stop offset="100%" stop-color="#f472b6" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Back Ears -->
+                <path d="M 30 90 L 15 20 L 75 60 Z" fill="#cbd5e1" />
+                <path d="M 170 90 L 185 20 L 125 60 Z" fill="#cbd5e1" />
+                <!-- Front Inner Ears -->
+                <path d="M 35 85 L 25 30 L 70 65 Z" fill="#fbcfe8" />
+                <path d="M 165 85 L 175 30 L 130 65 Z" fill="#fbcfe8" />
+
+                <!-- Main Head/Body -->
+                <ellipse cx="100" cy="110" rx="85" ry="70" fill="url(#body-grad)" />
+
+                <!-- Paws -->
+                <ellipse cx="60" cy="175" rx="15" ry="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+                <ellipse cx="140" cy="175" rx="15" ry="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+
+                <!-- Eyes Background -->
+                <circle cx="65" cy="100" r="16" fill="#e2e8f0" />
+                <circle cx="135" cy="100" r="16" fill="#e2e8f0" />
+                
+                <!-- Eyes Whites -->
+                <circle cx="65" cy="100" r="14" fill="#ffffff" />
+                <circle cx="135" cy="100" r="14" fill="#ffffff" />
+
+                <!-- Pupils (These are targeted by JS) -->
+                <g id="pupil-left">
+                    <circle cx="65" cy="100" r="9" fill="#334155" />
+                    <circle cx="62" cy="97" r="3" fill="#ffffff" /> <!-- Eye sparkle -->
+                </g>
+                <g id="pupil-right">
+                    <circle cx="135" cy="100" r="9" fill="#334155" />
+                    <circle cx="132" cy="97" r="3" fill="#ffffff" /> <!-- Eye sparkle -->
+                </g>
+
+                <!-- Cheeks -->
+                <circle cx="40" cy="115" r="12" fill="url(#blush-grad)" />
+                <circle cx="160" cy="115" r="12" fill="url(#blush-grad)" />
+
+                <!-- Nose -->
+                <path d="M 95 115 Q 100 120 105 115 Z" fill="#f472b6" />
+
+                <!-- Mouth -->
+                <path d="M 90 125 Q 100 135 110 125" stroke="#334155" stroke-width="3" stroke-linecap="round" fill="transparent" id="cat-mouth" />
+
+                <!-- Whiskers Left -->
+                <path d="M 45 120 L 15 115" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
+                <path d="M 45 125 L 15 130" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
+                
+                <!-- Whiskers Right -->
+                <path d="M 155 120 L 185 115" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
+                <path d="M 155 125 L 185 130" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </div>
+
+        <!-- Dashboard / Controls -->
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl w-full border border-pink-100">
+            
+            <!-- Status Bars -->
+            <div class="space-y-4 mb-6">
+                <!-- Happiness Bar -->
+                <div>
+                    <div class="flex justify-between text-sm font-bold text-slate-500 mb-1">
+                        <span>Happiness 💖</span>
+                        <span id="happiness-val">100%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3">
+                        <div id="happiness-bar" class="bg-pink-400 h-3 rounded-full bar-transition" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <!-- Fullness Bar -->
+                <div>
+                    <div class="flex justify-between text-sm font-bold text-slate-500 mb-1">
+                        <span>Fullness 🐟</span>
+                        <span id="fullness-val">100%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3">
+                        <div id="fullness-bar" class="bg-blue-400 h-3 rounded-full bar-transition" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <!-- Energy Bar -->
+                <div>
+                    <div class="flex justify-between text-sm font-bold text-slate-500 mb-1">
+                        <span>Energy ⚡</span>
+                        <span id="energy-val">100%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3">
+                        <div id="energy-bar" class="bg-yellow-400 h-3 rounded-full bar-transition" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="petCat()" class="bg-pink-100 hover:bg-pink-200 text-pink-600 font-bold py-3 px-4 rounded-2xl transition-transform active:scale-95 flex flex-col items-center justify-center gap-1 shadow-sm">
+                    <span class="text-xl">👋</span>
+                    <span class="text-xs">Pet</span>
+                </button>
+                <button onclick="feedCat()" class="bg-blue-100 hover:bg-blue-200 text-blue-600 font-bold py-3 px-4 rounded-2xl transition-transform active:scale-95 flex flex-col items-center justify-center gap-1 shadow-sm">
+                    <span class="text-xl">🐟</span>
+                    <span class="text-xs">Feed</span>
+                </button>
+                <button onclick="restCat()" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-600 font-bold py-3 px-4 rounded-2xl transition-transform active:scale-95 flex flex-col items-center justify-center gap-1 shadow-sm">
+                    <span class="text-xl">🛏️</span>
+                    <span class="text-xs">Rest</span>
+                </button>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p id="status-message" class="text-sm font-medium text-slate-400 italic">Mochi is feeling happy!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // State variables
+        let stats = {
+            happiness: 100,
+            fullness: 100,
+            energy: 100
+        };
+
+        // DOM Elements
+        const catContainer = document.getElementById('cat-container');
+        const catMouth = document.getElementById('cat-mouth');
+        const leftPupil = document.getElementById('pupil-left');
+        const rightPupil = document.getElementById('pupil-right');
+        const statusMessage = document.getElementById('status-message');
+
+        // Eye Tracking Logic
+        function handleMove(clientX, clientY) {
+            // Get cat center position
+            const rect = catContainer.getBoundingClientRect();
+            const catX = rect.left + rect.width / 2;
+            const catY = rect.top + rect.height / 2;
+
+            // Calculate angle and distance
+            const angle = Math.atan2(clientY - catY, clientX - catX);
+            // Limit the distance the pupil can move (max 5 pixels)
+            const distance = Math.min(5, Math.hypot(clientX - catX, clientY - catY) / 20); 
+
+            // Calculate new pupil coordinates relative to their center
+            const pupilX = Math.cos(angle) * distance;
+            const pupilY = Math.sin(angle) * distance;
+
+            // Apply transform
+            leftPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+            rightPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+        }
+
+        // Mouse & Touch listeners for eye tracking
+        document.addEventListener('mousemove', (e) => {
+            handleMove(e.clientX, e.clientY);
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                handleMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        // Particle System
+        function spawnParticles(emoji, amount = 3) {
+            const rect = catContainer.getBoundingClientRect();
+            
+            for (let i = 0; i < amount; i++) {
+                const particle = document.createElement('div');
+                particle.innerText = emoji;
+                particle.className = 'particle';
+                
+                // Random position around the cat's head
+                const startX = rect.left + (rect.width / 2) + (Math.random() * 80 - 40);
+                const startY = rect.top + (rect.height / 2) + (Math.random() * 40 - 20);
+                
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                
+                document.body.appendChild(particle);
+                
+                // Clean up after animation
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+
+        // Action Functions
+        function updateStats() {
+            // Constrain values between 0 and 100
+            stats.happiness = Math.max(0, Math.min(100, stats.happiness));
+            stats.fullness = Math.max(0, Math.min(100, stats.fullness));
+            stats.energy = Math.max(0, Math.min(100, stats.energy));
+
+            // Update UI Bars
+            document.getElementById('happiness-bar').style.width = `${stats.happiness}%`;
+            document.getElementById('happiness-val').innerText = `${Math.round(stats.happiness)}%`;
+            
+            document.getElementById('fullness-bar').style.width = `${stats.fullness}%`;
+            document.getElementById('fullness-val').innerText = `${Math.round(stats.fullness)}%`;
+            
+            document.getElementById('energy-bar').style.width = `${stats.energy}%`;
+            document.getElementById('energy-val').innerText = `${Math.round(stats.energy)}%`;
+
+            // Color changes based on levels
+            document.getElementById('happiness-bar').style.backgroundColor = stats.happiness < 30 ? '#ef4444' : '#f472b6';
+            document.getElementById('fullness-bar').style.backgroundColor = stats.fullness < 30 ? '#ef4444' : '#60a5fa';
+            document.getElementById('energy-bar').style.backgroundColor = stats.energy < 30 ? '#ef4444' : '#facc15';
+
+            updateCatExpression();
+        }
+
+        function updateCatExpression() {
+            // Change mouth expression based on happiness/fullness
+            if (stats.happiness < 30 || stats.fullness < 20) {
+                // Sad mouth
+                catMouth.setAttribute('d', 'M 90 135 Q 100 125 110 135');
+                statusMessage.innerText = "Mochi is feeling a bit grumpy...";
+            } else if (stats.energy < 30) {
+                // Neutral mouth
+                catMouth.setAttribute('d', 'M 90 130 L 110 130');
+                statusMessage.innerText = "Mochi looks tired.";
+            } else {
+                // Happy mouth (default W shape)
+                catMouth.setAttribute('d', 'M 90 125 Q 95 132 100 125 Q 105 132 110 125');
+                if (stats.happiness > 80 && stats.fullness > 80) {
+                     statusMessage.innerText = "Mochi is purr-fectly happy! 💖";
+                }
+            }
+        }
+
+        function petCat() {
+            if (stats.energy < 20) {
+                statusMessage.innerText = "Mochi is too tired to play right now.";
+                return;
+            }
+            stats.happiness += 15;
+            stats.energy -= 5;
+            spawnParticles('💖', 3);
+            
+            // Add temporary purr animation class
+            catContainer.classList.add('purr-anim');
+            setTimeout(() => {
+                catContainer.classList.remove('purr-anim');
+            }, 600); // Purr for 600ms
+
+            statusMessage.innerText = "Purrrrrrr...";
+            updateStats();
+        }
+
+        function feedCat() {
+            if (stats.fullness >= 100) {
+                statusMessage.innerText = "Mochi is too full to eat!";
+                return;
+            }
+            stats.fullness += 25;
+            stats.energy += 5;
+            stats.happiness += 5;
+            spawnParticles('🐟', 2);
+            statusMessage.innerText = "Nom nom nom!";
+            updateStats();
+        }
+
+        function restCat() {
+            if (stats.energy >= 100) {
+                statusMessage.innerText = "Mochi is not sleepy.";
+                return;
+            }
+            stats.energy += 30;
+            stats.fullness -= 10; // Resting burns a little food
+            spawnParticles('💤', 3);
+            
+            // Close eyes temporarily (simulate sleep)
+            leftPupil.style.opacity = '0';
+            rightPupil.style.opacity = '0';
+            catMouth.setAttribute('d', 'M 90 130 L 110 130'); // neutral sleeping mouth
+            statusMessage.innerText = "Zzzzz...";
+            
+            setTimeout(() => {
+                leftPupil.style.opacity = '1';
+                rightPupil.style.opacity = '1';
+                updateStats(); // This will reset the mouth
+            }, 1500);
+            
+            updateStats();
+        }
+
+        // Game Loop (Decreases stats over time to make it a "pet")
+        setInterval(() => {
+            stats.happiness -= 1;
+            stats.fullness -= 2;
+            stats.energy -= 0.5;
+            updateStats();
+        }, 5000); // Every 5 seconds
+
+        // Initialize
+        updateStats();
+
+    </script>
+</body>
 </html>
